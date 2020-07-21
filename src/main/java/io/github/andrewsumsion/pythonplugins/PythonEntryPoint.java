@@ -68,13 +68,17 @@ public class PythonEntryPoint {
         registerEvent(getEventClass(eventType), EventPriority.NORMAL, new DynamicListener<Event>() {
             @Override
             public void handle(final Event event) {
-                Bukkit.getScheduler().runTaskAsynchronously(PythonPlugins.getInstance(), new Runnable() {
+                SynchronousManager.startSync();
+                Thread thread = new Thread() {
                     @Override
                     public void run() {
                         handler.handle(event);
                     }
-                });
-                SynchronousManager.runUntilDone();
+                };
+                thread.start();
+                while (SynchronousManager.isSync()) {
+                    SynchronousManager.executeCommand();
+                }
             }
         });
     }

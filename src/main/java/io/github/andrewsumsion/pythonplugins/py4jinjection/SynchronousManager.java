@@ -5,54 +5,58 @@ import py4j.commands.Command;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class SynchronousManager {
-    private static boolean sync = false;
-    private static CommandCall waitingCommand;
+    private static final AtomicBoolean sync = new AtomicBoolean(false);
+    private static final AtomicReference<CommandCall> waitingCommand = new AtomicReference<>();
     private static ReentrantLock lock = new ReentrantLock();
+    private static final Object monitor = new Object();
 
     public static void startSync() {
-        sync = true;
+        sync.set(true);
     }
 
     public static void stopSync() {
-        sync = false;
+        sync.set(false);
     }
 
     public static boolean isSync() {
-        return sync;
+        return sync.get();
     }
 
     public static void setCommandCall(Command command, String commandLine, BufferedReader reader, BufferedWriter writer) {
-        waitingCommand = new CommandCall(command, commandLine, reader, writer);
+        waitingCommand.set(new CommandCall(command, commandLine, reader, writer));
     }
 
     public static CommandCall getCommandCall() {
-        return waitingCommand;
+        return waitingCommand.get();
     }
 
     public static ReentrantLock getLock() {
         return lock;
     }
 
-    public static void runUntilDone() {
-        while(sync) {
-            System.out.println("Entering loop because sync mode is enabled");
-            try {
-                System.out.println("runUntilDone: Waiting for lock");
-                getLock().lock();
-                System.out.println("runUntilDone: Lock acquired");
-                System.out.println("runUntilDone: Executing command");
-                waitingCommand.execute();
-                System.out.println("runUntilDone: Command executed");
-            } catch (IOException e) {
-                e.printStackTrace();
-            } finally {
-                getLock().unlock();
-                System.out.println("runUntilDone: Given up lock");
+    public static Object getMonitor() {
+        return monitor;
+    }
+
+    private static boolean printedNotAvailable = false;
+
+    public static void executeCommand() {
+        if(waitingCommand.get() == null) {
+            if(!printedNotAvailable) {
+                System.out.println("Command not available");
+                printedNotAvailable = !printedNotAvailable;
             }
+            return;
+        }
+        waitingCommand.get().execute();
+        //System.out.println("Command executed");
+        synchronized (monitor) {
+            monitor.notify();
         }
     }
 
@@ -85,8 +89,18 @@ public class SynchronousManager {
             return writer;
         }
 
-        public void execute() throws IOException {
-            command.execute(commandLine, reader, writer);
+        public void execute() {
+            if(command == null) {
+                return;
+            }
+            try {
+                command.execute(commandLine, reader, writer);
+                command = null;
+            } catch (IOException e) {
+                if(!e.getMessage().contains("Stream closed")) {
+                    e.printStackTrace();
+                }
+            }
         }
     }
 }

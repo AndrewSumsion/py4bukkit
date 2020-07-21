@@ -8,6 +8,11 @@ import py4j.commands.Command;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.Reader;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
 
 public class CommandWrapper implements Command {
     private Command wrapped;
@@ -19,17 +24,14 @@ public class CommandWrapper implements Command {
     @Override
     public void execute(String commandLine, BufferedReader bufferedReader, BufferedWriter bufferedWriter) throws Py4JException, IOException {
         if(SynchronousManager.isSync()) {
+
             SynchronousManager.setCommandCall(wrapped, commandLine, bufferedReader, bufferedWriter);
-            System.out.println("CommandWrapper: Set SynchronousManager command");
-            System.out.println("CommandWrapper: Waiting for SynchronousManager to lock");
-            while(!SynchronousManager.getLock().isLocked()) {}
-            System.out.println("CommandWrapper: SynchronousManager locked, waiting for unlock");
             try {
-                SynchronousManager.getLock().lock();
-                System.out.println("CommandWrapper: SynchronousManager unlocked; lock acquired");
-            } finally {
-                SynchronousManager.getLock().unlock();
-                System.out.println("CommandWrapper: Lock given up");
+                synchronized (SynchronousManager.getMonitor()) {
+                    SynchronousManager.getMonitor().wait();
+                }
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
         } else {
             wrapped.execute(commandLine, bufferedReader, bufferedWriter);
