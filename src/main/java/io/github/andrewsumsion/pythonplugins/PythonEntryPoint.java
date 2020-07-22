@@ -9,8 +9,6 @@ import org.bukkit.event.Listener;
 import org.bukkit.plugin.EventExecutor;
 import org.bukkit.plugin.Plugin;
 
-import java.io.IOException;
-
 public class PythonEntryPoint {
 
     private static final String[] eventPackages = {
@@ -64,23 +62,89 @@ public class PythonEntryPoint {
         return SynchronousManager.isSync();
     }
 
-    public void registerEvent(String eventType, final PythonHandler handler) {
+    public void registerEvent(String eventType, final PythonEventHandler handler) {
         registerEvent(getEventClass(eventType), EventPriority.NORMAL, new DynamicListener<Event>() {
             @Override
             public void handle(final Event event) {
-                SynchronousManager.startSync();
-                Thread thread = new Thread() {
+                runSynchronousTask(new Runnable() {
                     @Override
                     public void run() {
                         handler.handle(event);
                     }
-                };
-                thread.start();
-                while (SynchronousManager.isSync()) {
-                    SynchronousManager.executeCommand();
-                }
+                });
             }
         });
+    }
+
+    public void scheduleTask(final PythonTask task) {
+        scheduleDelayedTask(task, 0);
+    }
+
+    public void scheduleDelayedTask(final PythonTask task, long delay) {
+        Bukkit.getScheduler().runTaskLater(PythonPlugins.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                runSynchronousTask(new Runnable() {
+                    @Override
+                    public void run() {
+                        task.run();
+                    }
+                });
+            }
+        }, delay);
+    }
+
+    public void scheduleRepeatingTask(PythonTask task, long interval) {
+        scheduleDelayedRepeatingTask(task, 0, interval);
+    }
+
+    public void scheduleDelayedRepeatingTask(final PythonTask task, long delay, long interval) {
+        Bukkit.getScheduler().runTaskTimer(PythonPlugins.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                runSynchronousTask(new Runnable() {
+                    @Override
+                    public void run() {
+                        task.run();
+                    }
+                });
+            }
+        }, delay, interval);
+    }
+
+    public void scheduleAsyncTask(PythonTask task) {
+        scheduleDelayedAsyncTask(task, 0);
+    }
+
+    public void scheduleDelayedAsyncTask(final PythonTask task, long delay) {
+        Bukkit.getScheduler().runTaskLaterAsynchronously(PythonPlugins.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                task.run();
+            }
+        }, delay);
+    }
+
+    public void scheduleRepeatingAsyncTask(PythonTask task, long interval) {
+        scheduleDelayedRepeatingAsyncTask(task, 0, interval);
+    }
+
+    public void scheduleDelayedRepeatingAsyncTask(final PythonTask task, long delay, long interval) {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(PythonPlugins.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                task.run();
+            }
+        }, delay, interval);
+    }
+
+    private void runSynchronousTask(Runnable runnable) {
+        SynchronousManager.startSync();
+        Thread thread = new Thread(runnable);
+        thread.start();
+        while (SynchronousManager.isSync()) {
+            SynchronousManager.executeCommand();
+        }
     }
 
     private static void registerEvent(Class<? extends Event> eventClass, EventPriority priority, DynamicListener<? extends Event> listener) {

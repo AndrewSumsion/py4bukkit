@@ -1,5 +1,6 @@
 package io.github.andrewsumsion.pythonplugins.py4jinjection;
 
+import io.github.andrewsumsion.pythonplugins.PythonPlugins;
 import py4j.commands.Command;
 
 import java.io.BufferedReader;
@@ -96,10 +97,10 @@ public class SynchronousManager {
             try {
                 command.execute(commandLine, reader, writer);
                 command = null;
-            } catch (IOException e) {
-                if(!e.getMessage().contains("Stream closed")) {
-                    e.printStackTrace();
-                }
+            } catch (Exception e) {
+                PythonPlugins.getInstance().getLogger().severe("An error was encountered while running a synchronous Python task");
+                e.printStackTrace();
+                stopSync();
             }
         }
     }

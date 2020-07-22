@@ -2,6 +2,6 @@ package io.github.andrewsumsion.pythonplugins;
 
 import org.bukkit.event.Event;
 
-public interface PythonHandler {
+public interface PythonEventHandler {
     void handle(Event event);
 }

@@ -1,0 +1,5 @@
+# The command used to start a python program. In Windows, "python". In Linux, "python3"
+python-command: python
+
+# The name of the folder that python plugins are loaded from. Default is "python_plugins"
+plugin-folder-name: superpowers
