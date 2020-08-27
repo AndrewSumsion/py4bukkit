@@ -13,8 +13,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CommandWrapper implements Command {
+
     private Command wrapped;
 
     public CommandWrapper(Command wrapped) {
@@ -24,15 +26,7 @@ public class CommandWrapper implements Command {
     @Override
     public void execute(String commandLine, BufferedReader bufferedReader, BufferedWriter bufferedWriter) throws Py4JException, IOException {
         if(SynchronousManager.isSync()) {
-
-            SynchronousManager.setCommandCall(wrapped, commandLine, bufferedReader, bufferedWriter);
-            try {
-                synchronized (SynchronousManager.getMonitor()) {
-                    SynchronousManager.getMonitor().wait();
-                }
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
+            SynchronousManager.submitCommand(wrapped, commandLine, bufferedReader, bufferedWriter);
         } else {
             wrapped.execute(commandLine, bufferedReader, bufferedWriter);
         }
@@ -46,5 +40,20 @@ public class CommandWrapper implements Command {
     @Override
     public void init(Gateway gateway, Py4JServerConnection py4JServerConnection) {
         wrapped.init(gateway, py4JServerConnection);
+    }
+
+    private static class WrappedBufferedReader extends BufferedReader {
+
+        public WrappedBufferedReader(Reader in) {
+            super(in);
+        }
+
+        @Override
+        public String readLine() throws IOException {
+            String line = super.readLine();
+            System.err.print("String read: \"" + line.replace("\n", "") + "\"");
+            new Throwable().printStackTrace();
+            return line;
+        }
     }
 }

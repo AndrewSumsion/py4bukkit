@@ -12,6 +12,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -35,6 +37,10 @@ public class PythonPlugins extends JavaPlugin {
         gatewayServer.addListener(new ConnectionInjectorListener());
 
         gatewayServer.start();
+
+        //GatewayServer.turnLoggingOn();
+        //Logger logger = Logger.getLogger("py4j");
+        //logger.setLevel(Level.ALL);
 
         saveDefaultConfig();
 
@@ -66,7 +72,7 @@ public class PythonPlugins extends JavaPlugin {
             e.printStackTrace();
         }
 
-        new Thread(new Runnable() {
+        Thread loggingThread = new Thread(new Runnable() {
             private StringBuilder stdoutBuilder = new StringBuilder();
             private StringBuilder stderrBuilder = new StringBuilder();
 
@@ -104,7 +110,10 @@ public class PythonPlugins extends JavaPlugin {
                 }
                 getLogger().info("Python process disconnected");
             }
-        }).start();
+        });
+
+        loggingThread.setDaemon(true);
+        loggingThread.start();
 
         Thread closeChildThread = new Thread() {
             public void run() {
