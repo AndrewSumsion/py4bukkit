@@ -1,4 +1,4 @@
-package io.github.andrewsumsion.pythonplugins;
+package io.github.andrewsumsion.py4bukkit;
 
 public interface PythonTask {
     void run();

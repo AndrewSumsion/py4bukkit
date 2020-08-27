@@ -1,7 +1,6 @@
-package io.github.andrewsumsion.pythonplugins;
+package io.github.andrewsumsion.py4bukkit;
 
-import io.github.andrewsumsion.pythonplugins.py4jinjection.ConnectionInjectorListener;
-import org.bukkit.Bukkit;
+import io.github.andrewsumsion.py4bukkit.py4jinjection.ConnectionInjectorListener;
 import org.bukkit.plugin.java.JavaPlugin;
 import py4j.GatewayServer;
 import py4j.reflection.ReflectionUtil;
@@ -10,10 +9,6 @@ import py4j.reflection.RootClassLoadingStrategy;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 

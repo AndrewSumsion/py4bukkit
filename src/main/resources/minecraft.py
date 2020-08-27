@@ -13,7 +13,7 @@ class Handler:
         gateway.entry_point.stopSync()
 
     class Java:
-        implements = ["io.github.andrewsumsion.pythonplugins.PythonEventHandler"]
+        implements = ["io.github.andrewsumsion.py4bukkit.PythonEventHandler"]
 
 class SyncTask:
     def __init__(self, task_method):
@@ -24,7 +24,7 @@ class SyncTask:
         gateway.entry_point.stopSync()
     
     class Java:
-        implements = ["io.github.andrewsumsion.pythonplugins.PythonTask"]
+        implements = ["io.github.andrewsumsion.py4bukkit.PythonTask"]
 
 class AsyncTask:
     def __init__(self, task_method):
@@ -34,7 +34,7 @@ class AsyncTask:
         self.task_method()
     
     class Java:
-        implements = ["io.github.andrewsumsion.pythonplugins.PythonTask"]
+        implements = ["io.github.andrewsumsion.py4bukkit.PythonTask"]
 
 def on_event(event, handler_method):
     gateway.entry_point.registerEvent(event, Handler(handler_method))

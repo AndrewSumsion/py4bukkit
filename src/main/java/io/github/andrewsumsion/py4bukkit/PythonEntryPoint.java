@@ -1,6 +1,6 @@
-package io.github.andrewsumsion.pythonplugins;
+package io.github.andrewsumsion.py4bukkit;
 
-import io.github.andrewsumsion.pythonplugins.py4jinjection.SynchronousManager;
+import io.github.andrewsumsion.py4bukkit.py4jinjection.SynchronousManager;
 import org.bukkit.Bukkit;
 import org.bukkit.Server;
 import org.bukkit.event.Event;

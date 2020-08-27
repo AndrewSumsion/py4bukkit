@@ -1,6 +1,6 @@
-package io.github.andrewsumsion.pythonplugins.py4jinjection;
+package io.github.andrewsumsion.py4bukkit.py4jinjection;
 
-import io.github.andrewsumsion.pythonplugins.PythonPlugins;
+import io.github.andrewsumsion.py4bukkit.PythonPlugins;
 import py4j.GatewayServerListener;
 import py4j.Py4JServerConnection;
 import py4j.commands.Command;

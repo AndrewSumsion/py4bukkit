@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>io.github.andrewsumsion</groupId>
-    <artifactId>PythonPlugins</artifactId>
+    <artifactId>py4bukkit</artifactId>
     <version>1.0-SNAPSHOT</version>
 
     <properties>

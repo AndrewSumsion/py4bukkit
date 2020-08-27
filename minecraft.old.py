@@ -15,7 +15,7 @@ class Handler:
         self.handler_method(event)
 
     class Java:
-        implements = ["io.github.andrewsumsion.pythonplugins.PythonEventHandler"]
+        implements = ["io.github.andrewsumsion.py4bukkit.PythonEventHandler"]
 
 def on_event(event, handler_method):
     gateway.entry_point.subscribe(event)

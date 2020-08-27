@@ -1,4 +1,4 @@
-package io.github.andrewsumsion.pythonplugins.py4jinjection;
+package io.github.andrewsumsion.py4bukkit.py4jinjection;
 
 import py4j.Gateway;
 import py4j.Py4JException;
@@ -9,11 +9,6 @@ import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 public class CommandWrapper implements Command {
 

@@ -15,7 +15,7 @@ class Handler:
         gateway.entry_point.stopSync()
 
     class Java:
-        implements = ["io.github.andrewsumsion.pythonplugins.PythonEventHandler"]
+        implements = ["io.github.andrewsumsion.py4bukkit.PythonEventHandler"]
 
 def on_event(event, handler_method):
     gateway.entry_point.registerEvent(event, Handler(handler_method))
